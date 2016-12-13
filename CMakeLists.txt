@@ -56,7 +56,7 @@ set( CMAKE_DISABLE_IN_SOURCE_BUILD ON )
 if (CORE_USE_CUDA)
     find_package(CUDA REQUIRED)
     add_definitions(-DUSE_CUDA)
-    set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11 -arch=sm_30" )
+    set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11 -arch=sm_30 --expt-relaxed-constexpr" )
 endif()
 #############################################
 

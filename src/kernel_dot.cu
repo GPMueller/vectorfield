@@ -26,6 +26,7 @@ namespace Kernel
 
         // Dot product
         cu_dot<<<(n+1023)/1024, 1024>>>(v1.data(), v2.data(), ret.data(), n);
+        cudaDeviceSynchronize();
 
         // Reduction of the array
         for (int i=1; i<n; ++i)
