@@ -5,23 +5,10 @@
 #include <iostream>
 #include <stdio.h>
 
-
-static void HandleError( cudaError_t err, const char *file, int line )
-{
-	// CUDA error handeling from the "CUDA by example" book
-	if (err != cudaSuccess)
-    {
-		printf( "%s in %s at line %d\n", cudaGetErrorString( err ), file, line );
-		exit( EXIT_FAILURE );
-	}
-}
-
-#define HANDLE_ERROR( err ) (HandleError( err, __FILE__, __LINE__ ))
-
 // CUDA Version
 namespace Kernel
 {
-    __global__ void cu_dot(Vector3 *v1, Vector3 *v2, double *out, size_t N)
+    __global__ void cu_dot(const Vector3 *v1, const Vector3 *v2, double *out, size_t N)
     {
         int idx = blockIdx.x * blockDim.x + threadIdx.x;
         if(idx < N)
@@ -32,33 +19,19 @@ namespace Kernel
     }
 
     // The wrapper for the calling of the actual kernel
-    double dot(const vectorfield & v1, const vectorfield & v2)
+    scalar dot(const vectorfield & v1, const vectorfield & v2)
     {        
         int n = v1.size();
-        double *ret = new double[n];
+        scalarfield ret(n);
 
-        // // Allocate device arrays
-        // Eigen::Vector3d *dev_v1, *dev_v2;
-        // HANDLE_ERROR(cudaMalloc((void **)&dev_v1, sizeof(Eigen::Vector3d)*n));
-        // HANDLE_ERROR(cudaMalloc((void **)&dev_v2, sizeof(Eigen::Vector3d)*n));
-        // double* dev_ret;
-        // HANDLE_ERROR(cudaMalloc((void **)&dev_ret, sizeof(double)*n));
+        // Dot product
+        cu_dot<<<(n+1023)/1024, 1024>>>(v1.data(), v2.data(), ret.data(), n);
 
-        // // Copy to device
-        // HANDLE_ERROR(cudaMemcpy(dev_v1, v1.data(), sizeof(Eigen::Vector3d)*n, cudaMemcpyHostToDevice));
-        // HANDLE_ERROR(cudaMemcpy(dev_v2, v2.data(), sizeof(Eigen::Vector3d)*n, cudaMemcpyHostToDevice));
-
-        // // Dot product
-        // cu_dot<<<(n+1023)/1024, 1024>>>(dev_v1, dev_v2, dev_ret, n);
-        
-        // // Copy to host
-        // HANDLE_ERROR(cudaMemcpy(ret, dev_ret, sizeof(double)*n, cudaMemcpyDeviceToHost));
-
-        // // Reduction of the array
-        // for (int i=1; i<n; ++i)
-        // {
-        //     ret[0] += ret[i];
-        // }
+        // Reduction of the array
+        for (int i=1; i<n; ++i)
+        {
+            ret[0] += ret[i];
+        }
 
         // Return
         return ret[0];

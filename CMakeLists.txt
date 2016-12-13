@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.11)
 #############################################
 
 ######### Options ###########################
-option( CORE_USE_CUDA    "Use CUDA to speed up certain parts of the code."              OFF )
+option( CORE_USE_CUDA    "Use CUDA to speed up certain parts of the code."              ON )
 #############################################
 
 
@@ -56,6 +56,7 @@ set( CMAKE_DISABLE_IN_SOURCE_BUILD ON )
 if (CORE_USE_CUDA)
     find_package(CUDA REQUIRED)
     add_definitions(-DUSE_CUDA)
+    set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11 -arch=sm_30" )
 endif()
 #############################################
 
