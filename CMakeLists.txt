@@ -15,7 +15,7 @@ set(META_PROJECT_NAME         "vectorfield")
 set(META_PROJECT_DESCRIPTION  "vectorfield numerics library with cuda backend")
 set(META_AUTHOR_ORGANIZATION  "")
 set(META_AUTHOR_DOMAIN        "https://github.com/GPMueller")
-set(META_AUTHOR_MAINTAINER    "g.mueller@fz-juelich.de")
+set(META_AUTHOR_MAINTAINER    "gideon.mueller.91@outlook.com")
 set(META_VERSION_MAJOR        "0")
 set(META_VERSION_MINOR        "0")
 set(META_VERSION_PATCH        "0")
@@ -96,27 +96,31 @@ install(DIRECTORY include DESTINATION include/vectorfield)
 
 
 ######### Test executable ###################
+set( TEST_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR} )
+### Test creation macro
+macro( add_framework_test testName testSrc )
+    # Executable
+    add_executable( ${testName} test/main.cpp ${testSrc} )
+    # Link Library
+    target_link_libraries( ${testName} ${PROJECT_NAME} )
+    # Properties
+    set_property(TARGET ${testName} PROPERTY RUNTIME_OUTPUT_DIRECTORY ${TEST_RUNTIME_OUTPUT_DIRECTORY})
+    set_property(TARGET ${testName} PROPERTY CXX_STANDARD 11)
+    set_property(TARGET ${testName} PROPERTY CXX_STANDARD_REQUIRED ON)
+    set_property(TARGET ${testName} PROPERTY CXX_EXTENSIONS OFF)
+    # Include Directories
+    target_include_directories( ${testName} PRIVATE ${PROJECT_SOURCE_DIR}/test)
+    # Add the test
+    add_test( NAME        ${testName}
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+        COMMAND           ${testName} --use-colour=yes )
+endmacro( add_framework_test testName testSrc )
+### Create tests if needed
 if ( VF_BUILD_TEST )
-    ### Have the binary placed into the source head
-    set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR} )
-    ### Output paths for multi-config builds (e.g. msvc)
-    foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
-        string( TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG )
-        set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_SOURCE_DIR} )
-        # set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${youroutputdirectory} )
-        # set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${youroutputdirectory} )
-    endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
-    ### Build Library
-    add_executable( vftest test/main.cpp test/test.cpp )
-    ### Link
-    target_link_libraries( vftest ${PROJECT_NAME} )
-    ### Include Directories
-    target_include_directories( vftest PRIVATE ${PROJECT_SOURCE_DIR}/test)
-    ### Properties
-    set_property(TARGET vftest PROPERTY CXX_STANDARD 11)
-    set_property(TARGET vftest PROPERTY CXX_STANDARD_REQUIRED ON)
-    set_property(TARGET vftest PROPERTY CXX_EXTENSIONS OFF)
-    ### Install
-    install(TARGETS vftest DESTINATION bin)
+    ### Enable CTest testing
+    enable_testing()
+
+    ###### Test 1
+    add_framework_test( vftest test/test.cpp )
 endif()
 #############################################

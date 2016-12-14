@@ -1,16 +1,13 @@
-#include <test.hpp>
+#include <catch.hpp>
 #include <vectorfield.hpp>
 #include <kernel_dot.hpp>
 
-namespace Test
+
+TEST_CASE( "N-dimensional dot product", "[dot]" )
 {
-    double testfunction()
-    {
-        vectorfield v1(10, Vector3{ 1.0, 1.0, 1.0 });
-        vectorfield v2(10, Vector3{ -1.0, 1.0, 1.0 });
-
-        scalar x = Kernel::dot(v1,v2);
-
-        return x;
-    } 
+    int N = 10000;
+    vectorfield v1(N, Vector3{ 1.0, 1.0, 1.0 });
+    vectorfield v2(N, Vector3{ -1.0, 1.0, 1.0 });
+    REQUIRE( Kernel::dot(v1,v2) == N );
+    REQUIRE( Kernel::dot(v1,v2)-1 == N-1 );
 }
