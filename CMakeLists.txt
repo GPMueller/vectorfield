@@ -1,23 +1,38 @@
 ######### CMake Version #####################
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+#############################################
+set( CMAKE_DISABLE_SOURCE_CHANGES  ON )
+set( CMAKE_DISABLE_IN_SOURCE_BUILD ON )
 #############################################
 
 ######### Options ###########################
-option( CORE_USE_CUDA    "Use CUDA to speed up certain parts of the code."              ON )
+option( VF_USE_CUDA    "Use CUDA to speed up certain parts of the code."              ON )
+option( VF_BUILD_TEST  "Build small test project using the library."                  ON )
 #############################################
 
+######### Meta information about the project
+set(META_PROJECT_NAME         "vectorfield")
+set(META_PROJECT_DESCRIPTION  "vectorfield numerics library with cuda backend")
+set(META_AUTHOR_ORGANIZATION  "")
+set(META_AUTHOR_DOMAIN        "https://github.com/GPMueller")
+set(META_AUTHOR_MAINTAINER    "g.mueller@fz-juelich.de")
+set(META_VERSION_MAJOR        "0")
+set(META_VERSION_MINOR        "0")
+set(META_VERSION_PATCH        "0")
+set(META_VERSION_REVISION     "${GIT_REV}")
+set(META_VERSION              "${META_VERSION_MAJOR}.${META_VERSION_MINOR}.${META_VERSION_PATCH}")
+set(META_NAME_VERSION         "${META_PROJECT_NAME} v${META_VERSION} (${META_VERSION_REVISION})")
+#############################################
 
 ######### CUDA decisions ####################
-if (CORE_USE_CUDA)
+if (VF_USE_CUDA)
     MESSAGE( STATUS ">> --------------  USING CUDA --------------" )
     set( CUDA_TOOLKIT_ROOT_DIR "/opt/cuda" )
     if (APPLE OR UNIX)
         set(CMAKE_C_COMPILER   /opt/cuda/bin/gcc)
         set(CMAKE_CXX_COMPILER /opt/cuda/bin/g++)
     elseif (WIN32)
-        ### By default we use VS
-        MESSAGE( STATUS ">> User compiler:             MSVC" )
-        MESSAGE( STATUS ">> Choosing a different compiler is not yet implemented for Windows" )
+        MESSAGE( STATUS ">> We are on Windows... CUDA Path needs to be set..." )
     endif()
 endif()
 #############################################
@@ -30,45 +45,27 @@ MESSAGE( STATUS ">> CMAKE_CXX_COMPILER:      " ${CMAKE_CXX_COMPILER} )
 
 
 ######### Project Name ######################
-project( vectorfield )
-SET( EXECUTABLE_NAME run )
-#############################################
-
-
-### Find includes in corresponding build directories
-set( CMAKE_INCLUDE_CURRENT_DIR ON )
-######### Have the binary placed into the source head
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR} )
-### Output paths for multi-config builds (e.g. msvc)
-foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
-    string( TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG )
-    set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_SOURCE_DIR} )
-    # set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${youroutputdirectory} )
-    # set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${youroutputdirectory} )
-endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
-#############################################
-set( CMAKE_DISABLE_SOURCE_CHANGES  ON )
-set( CMAKE_DISABLE_IN_SOURCE_BUILD ON )
+project( ${META_PROJECT_NAME} VERSION ${META_VERSION} )
 #############################################
 
 
 ######### CUDA decisions ####################
-if (CORE_USE_CUDA)
+if (VF_USE_CUDA)
     find_package(CUDA REQUIRED)
     add_definitions(-DUSE_CUDA)
-    set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11 -arch=sm_30 --expt-relaxed-constexpr" )
+    set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --std=c++11 -arch=sm_30 --expt-relaxed-constexpr" )
 endif()
 #############################################
 
-#############################################
+
+
+######### Files #############################
 set(HEADER_FILES
-    include/test.hpp
     include/vf_allocator.hpp
     include/kernel_dot.hpp
 )
 
 set(SOURCE_FILES
-    src/test.cpp
     src/kernel_dot.cu
     src/kernel_dot.cpp
 )
@@ -76,20 +73,50 @@ set(SOURCE_FILES
 
 
 
-#############################################
-if (CORE_USE_CUDA)
-    include_directories( ${EXECUTABLE_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/thirdparty)
-    cuda_add_executable( ${EXECUTABLE_NAME} main.cpp ${SOURCE_FILES} )
+######### libvectorfield ####################
+### Build and Link Library
+if ( VF_USE_CUDA )
+    include_directories( ${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/thirdparty)
+    cuda_add_library( ${PROJECT_NAME} ${SOURCE_FILES} STATIC)
+    target_link_libraries( ${PROJECT_NAME} ${CUDA_LIBRARIES} )
 else()
-    add_executable( ${EXECUTABLE_NAME} main.cpp ${SOURCE_FILES} )
+    add_library( ${PROJECT_NAME} ${SOURCE_FILES} STATIC)
 endif()
+### Include Directories
+target_include_directories( ${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories( ${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
+### Properties
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_EXTENSIONS OFF)
+### Install
+install(TARGETS ${PROJECT_NAME} DESTINATION lib)
+install(DIRECTORY include DESTINATION include/vectorfield)
+#############################################
 
-target_link_libraries( ${EXECUTABLE_NAME} ${CUDA_LIBRARIES})
 
-target_include_directories( ${EXECUTABLE_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_include_directories( ${EXECUTABLE_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
-
-set_property(TARGET ${EXECUTABLE_NAME} PROPERTY CXX_STANDARD 11)
-set_property(TARGET ${EXECUTABLE_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
-set_property(TARGET ${EXECUTABLE_NAME} PROPERTY CXX_EXTENSIONS OFF)
+######### Test executable ###################
+if ( VF_BUILD_TEST )
+    ### Have the binary placed into the source head
+    set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR} )
+    ### Output paths for multi-config builds (e.g. msvc)
+    foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
+        string( TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG )
+        set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_SOURCE_DIR} )
+        # set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${youroutputdirectory} )
+        # set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${youroutputdirectory} )
+    endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
+    ### Build Library
+    add_executable( vftest test/main.cpp test/test.cpp )
+    ### Link
+    target_link_libraries( vftest ${PROJECT_NAME} )
+    ### Include Directories
+    target_include_directories( vftest PRIVATE ${PROJECT_SOURCE_DIR}/test)
+    ### Properties
+    set_property(TARGET vftest PROPERTY CXX_STANDARD 11)
+    set_property(TARGET vftest PROPERTY CXX_STANDARD_REQUIRED ON)
+    set_property(TARGET vftest PROPERTY CXX_EXTENSIONS OFF)
+    ### Install
+    install(TARGETS vftest DESTINATION bin)
+endif()
 #############################################
