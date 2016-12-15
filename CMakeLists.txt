@@ -61,14 +61,20 @@ endif()
 
 ######### Files #############################
 set(HEADER_FILES
-    include/vf_allocator.hpp
+    include/vectorfield.hpp
+    include/managed_allocator.hpp
     include/kernel_dot.hpp
+    include/kernel_manifold.hpp
 )
+source_group( "include" FILES ${HEADER_FILES} )
 
 set(SOURCE_FILES
     src/kernel_dot.cu
     src/kernel_dot.cpp
+    src/kernel_manifold.cu
+    src/kernel_manifold.cpp
 )
+source_group( "src" FILES ${SOURCE_FILES} )
 #############################################
 
 
@@ -77,14 +83,14 @@ set(SOURCE_FILES
 ### Build and Link Library
 if ( VF_USE_CUDA )
     include_directories( ${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/thirdparty)
-    cuda_add_library( ${PROJECT_NAME} ${SOURCE_FILES} STATIC)
+    cuda_add_library( ${PROJECT_NAME} STATIC ${HEADER_FILES} ${SOURCE_FILES} )
     target_link_libraries( ${PROJECT_NAME} ${CUDA_LIBRARIES} )
 else()
-    add_library( ${PROJECT_NAME} ${SOURCE_FILES} STATIC)
+    add_library( ${PROJECT_NAME} STATIC ${HEADER_FILES} ${SOURCE_FILES} )
 endif()
 ### Include Directories
 target_include_directories( ${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_include_directories( ${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
+target_include_directories( ${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/thirdparty)
 ### Properties
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
