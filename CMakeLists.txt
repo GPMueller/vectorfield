@@ -63,14 +63,14 @@ endif()
 set(HEADER_FILES
     include/vectorfield.hpp
     include/managed_allocator.hpp
-    include/kernel_dot.hpp
+    include/kernel_vectormath.hpp
     include/kernel_manifold.hpp
 )
 source_group( "include" FILES ${HEADER_FILES} )
 
 set(SOURCE_FILES
-    src/kernel_dot.cu
-    src/kernel_dot.cpp
+    src/kernel_vectormath.cu
+    src/kernel_vectormath.cpp
     src/kernel_manifold.cu
     src/kernel_manifold.cpp
 )

@@ -1,6 +1,6 @@
 #ifdef USE_CUDA
 
-#include <kernel_dot.hpp>
+#include <kernel_vectormath.hpp>
 
 #include <iostream>
 #include <stdio.h>

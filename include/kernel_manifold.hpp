@@ -23,6 +23,10 @@ namespace Kernel
     // Invert v1's component orthogonal to v2
 	//    This assumes normalized vectorfields
     void invert_orthogonal(vectorfield & v1, const vectorfield & v2);
+
+    // TODO:
+    // geodesic distance
+    // tangent calculation for chains of vectorfields
 }
 
 #endif

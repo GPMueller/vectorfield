@@ -1,6 +1,6 @@
 #ifndef USE_CUDA
 
-#include <kernel_dot.hpp>
+#include <kernel_vectormath.hpp>
 #include <kernel_manifold.hpp>
 
 // C++ Version
