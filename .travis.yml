@@ -1,31 +1,6 @@
-# Use new trusty images, should yield newer compilers and packages
 sudo: false
 dist: precise
 language: cpp
-
-# os:
-#   - linux
-#   - osx
-
-# compiler:
-#   - gcc
-#   - clang
-
-# install:
-# - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
-
-# addons:
-#   apt:
-#     sources:
-#     # add PPAs with more up-to-date toolchains
-#     - ubuntu-toolchain-r-test
-#     - llvm-toolchain-precise-3.6
-#     packages:
-#     # install toolchains
-#     - gcc-5
-#     - g++-5
-#     - clang-3.6
-
 
 addons:
   apt:
@@ -33,9 +8,6 @@ addons:
       - g++-6
     sources: &sources
       - ubuntu-toolchain-r-test
-
-# env: COMPILER=g++-4.9
-
 
 cache:
   directories:
@@ -115,13 +87,6 @@ before_script:
     cmake -DCMAKE_CXX_COMPILER=$COMPILER ..
     cd ..
 
-script: ./make.sh
-
-
-# script:
-#   - mkdir -p build
-#   - cd build
-#   - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make
-#   - ./vftest
-# before_script: ./cmake.sh
-# script: ./make.sh
+script:
+  - ./make.sh
+  - cd build && ./vftest
