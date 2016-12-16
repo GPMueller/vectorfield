@@ -40,12 +40,12 @@ namespace Kernel
     }
 
 
-    __global__ void cu_dot(const Vector3 *vf1, const Vector3 *v2, double *out, size_t N)
+    __global__ void cu_dot(const Vector3 *vf1, const Vector3 *vf2, double *out, size_t N)
     {
         int idx = blockIdx.x * blockDim.x + threadIdx.x;
         if(idx < N)
         {
-            out[idx] = vf1[idx].dot(v2[idx]);
+            out[idx] = vf1[idx].dot(vf2[idx]);
         }
     }
 

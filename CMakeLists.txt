@@ -27,10 +27,13 @@ set(META_NAME_VERSION         "${META_PROJECT_NAME} v${META_VERSION} (${META_VER
 ######### CUDA decisions ####################
 if (VF_USE_CUDA)
     MESSAGE( STATUS ">> --------------  USING CUDA --------------" )
-    set( CUDA_TOOLKIT_ROOT_DIR "/opt/cuda" )
+    ### Set cuda toolkit path 
+    if( (NOT CUDA_TOOLKIT_ROOT_DIR) )
+        set( CUDA_TOOLKIT_ROOT_DIR /opt/cuda )
+    endif()
     if (APPLE OR UNIX)
-        set(CMAKE_C_COMPILER   /opt/cuda/bin/gcc)
-        set(CMAKE_CXX_COMPILER /opt/cuda/bin/g++)
+        set(CMAKE_C_COMPILER   ${CUDA_TOOLKIT_ROOT_DIR}/bin/gcc)
+        set(CMAKE_CXX_COMPILER ${CUDA_TOOLKIT_ROOT_DIR}/bin/g++)
     elseif (WIN32)
         MESSAGE( STATUS ">> We are on Windows... CUDA Path needs to be set..." )
     endif()
