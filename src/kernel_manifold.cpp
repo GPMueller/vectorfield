@@ -6,56 +6,60 @@
 // C++ Version
 namespace Kernel
 {
-	scalar norm(const vectorfield & v1)
+	scalar norm(const vectorfield & vf)
 	{
-		scalar x = dot(v1, v1);
+		scalar x = dot(vf, vf);
 		return std::sqrt(x);
 	}
 
-	void normalize(vectorfield & v1)
+	void normalize(vectorfield & vf)
 	{
-		scalar x = 1.0/norm(v1);
-		for (unsigned int i = 0; i < v1.size(); ++i)
+		scalar x = 1.0/norm(vf);
+		for (unsigned int i = 0; i < vf.size(); ++i)
 		{
-			v1[i] *= x;
+			vf[i] *= x;
 		}
 	}
 
-    void project_parallel(vectorfield & v1, const vectorfield & v2)
+    void project_parallel(vectorfield & vf1, const vectorfield & vf2)
     {
-        vectorfield v3 = v1;
-        project_orthogonal(v3, v2);
-		for (unsigned int i = 0; i < v1.size(); ++i)
+        vectorfield vf3 = vf1;
+        project_orthogonal(vf3, vf2);
+        // TODO: replace the loop with Vectormath Kernel
+		for (unsigned int i = 0; i < vf1.size(); ++i)
 		{
-			v1[i] -= v3[i];
+			vf1[i] -= vf3[i];
 		}
     }
 
-    void project_orthogonal(vectorfield & v1, const vectorfield & v2)
+    void project_orthogonal(vectorfield & vf1, const vectorfield & vf2)
     {
-        scalar x=dot(v1, v2);
-        for (unsigned int i=0; i<v1.size(); ++i)
+        scalar x=dot(vf1, vf2);
+        // TODO: replace the loop with Vectormath Kernel
+        for (unsigned int i=0; i<vf1.size(); ++i)
         {
-            v1[i] -= x*v2[i];
+            vf1[i] -= x*vf2[i];
         }
     }
 
-    void invert_parallel(vectorfield & v1, const vectorfield & v2)
+    void invert_parallel(vectorfield & vf1, const vectorfield & vf2)
     {
-        scalar x=dot(v1, v2);
-        for (unsigned int i=0; i<v1.size(); ++i)
+        scalar x=dot(vf1, vf2);
+        // TODO: replace the loop with Vectormath Kernel
+        for (unsigned int i=0; i<vf1.size(); ++i)
         {
-            v1[i] -= 2*x*v2[i];
+            vf1[i] -= 2*x*vf2[i];
         }
     }
     
-    void invert_orthogonal(vectorfield & v1, const vectorfield & v2)
+    void invert_orthogonal(vectorfield & vf1, const vectorfield & vf2)
     {
-        vectorfield v3 = v1;
-        project_orthogonal(v3, v2);
-		for (unsigned int i = 0; i < v1.size(); ++i)
+        vectorfield vf3 = vf1;
+        project_orthogonal(vf3, vf2);
+        // TODO: replace the loop with Vectormath Kernel
+		for (unsigned int i = 0; i < vf1.size(); ++i)
 		{
-			v1[i] -= 2 * v3[i];
+			vf1[i] -= 2 * vf3[i];
 		}
     }
 }

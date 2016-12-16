@@ -48,12 +48,14 @@ TEST_CASE( "Manifold operations", "[manifold]" )
 
 	SECTION("Projection: parallel")
 	{
+		REQUIRE_FALSE( Kernel::dot(v1,v2) == Approx(Kernel::norm(v1)*Kernel::norm(v2)) );
 		Kernel::project_parallel(v1,v2);
 		REQUIRE( Kernel::dot(v1,v2) == Approx(Kernel::norm(v1)*Kernel::norm(v2)) );
 	}
 
 	SECTION("Projection: orthogonal")
 	{
+		REQUIRE_FALSE( Kernel::dot(v1,v2) == Approx(0) );
 		Kernel::project_orthogonal(v1,v2);
 		REQUIRE( Kernel::dot(v1,v2) == Approx(0) );
 	}
@@ -61,6 +63,7 @@ TEST_CASE( "Manifold operations", "[manifold]" )
 	SECTION("Invert: parallel")
 	{
 		scalar proj_prev = Kernel::dot(v1, v2);
+		REQUIRE_FALSE( Kernel::dot(v1,v2) == Approx(-proj_prev) );
 		Kernel::invert_parallel(v1,v2);
 		REQUIRE( Kernel::dot(v1,v2) == Approx(-proj_prev) );
 	}
@@ -70,6 +73,7 @@ TEST_CASE( "Manifold operations", "[manifold]" )
 		vectorfield v3 = v1;
 		Kernel::project_orthogonal(v3, v2);
 		scalar proj_prev = Kernel::dot(v1, v3);
+		REQUIRE( Kernel::dot(v1, v3) == Approx(proj_prev) );
 		Kernel::invert_orthogonal(v1,v2);
 		REQUIRE( Kernel::dot(v1, v3) == Approx(-proj_prev) );
 	}

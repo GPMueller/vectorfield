@@ -84,7 +84,7 @@ before_script:
   - |
     mkdir -p build
     cd build
-    cmake -DCMAKE_CXX_COMPILER=$COMPILER ..
+    cmake -DCMAKE_CXX_COMPILER=$COMPILER -DVF_USE_CUDA=Off ..
     cd ..
 
 script:

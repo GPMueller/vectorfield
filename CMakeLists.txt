@@ -6,7 +6,7 @@ set( CMAKE_DISABLE_IN_SOURCE_BUILD ON )
 #############################################
 
 ######### Options ###########################
-option( VF_USE_CUDA    "Use CUDA to speed up certain parts of the code."              OFF )
+option( VF_USE_CUDA    "Use CUDA to speed up certain parts of the code."              ON )
 option( VF_BUILD_TEST  "Build small test project using the library."                  ON )
 #############################################
 

@@ -17,6 +17,15 @@ namespace Kernel
         }
     }
 
+    void scale(vectorfield & vf, const scalar & sc)
+    {
+        for (unsigned int i=0; i<vf.size(); ++i)
+        {
+            vf[i] *= sc;
+        }
+    }
+
+
 	// computes the inner product of two vectorfields v1 and v2
 	scalar dot(const vectorfield & v1, const vectorfield & v2)
 	{
