@@ -5,8 +5,7 @@ Kernels acting on scalar- and vectorfields
 
 | Service | System | Compiler | Status |
 | ------- | ------ | -------- | -----: |
-|  [Travis-CI](https://travis-ci.org/GPMueller/vectorfield) | Ubuntu 14.04 | GCC 6 | [![Build Status](https://travis-ci.org/GPMueller/vectorfield.svg?branch=master)](https://travis-ci.org/GPMueller/vectorfield) |
-|  [Travis-CI](https://travis-ci.org/GPMueller/vectorfield) | macOS | Clang ? | upcoming |
+|  [Travis-CI](https://travis-ci.org/GPMueller/vectorfield) | Ubuntu 14.04 <br/> macOS | GCC 6 <br/> Clang | [![Build Status](https://travis-ci.org/GPMueller/vectorfield.svg?branch=master)](https://travis-ci.org/GPMueller/vectorfield) |
 
 The vectorfields are setup as `std::vector<Eigen::Vector3d>` with optional CUDA support.
 If CUDA is used, an allocator using cudaMallocManaged is employed so that the user
